@@ -1,0 +1,59 @@
+#ifndef _SPP_ASYNC_DEF_H
+#define _SPP_ASYNC_DEF_H
+
+#include "../comm/singleton.h"
+#include "../comm/tbase/tlog.h"
+#define  INTERNAL_LOG  SingleTon<CTLog, CreateByProto>::Instance()
+#define  DEFAULT_RECONNECT_INTERVAL 			10000
+#define  DEFAULT_CON_IDLE_TIMEOUT			0
+#define  MAX_CONNECT_DELAY_US 				 100000
+
+#define  MIN_EPOLL_WAIT_TIME			1	
+#define  DEFAULT_EPOLL_WAIT_TIME	    400
+
+enum CON_RET_CODE {
+    CON_SUCC = 0,
+    CON_QUIT = 1,
+    CON_BACK_TO_IDLE = 2,
+    SUCCESS_RET_WITHOUT_INCOME = 1,
+    CON_ERR_SHUTDOWN = -1,
+    RECV_ERR_TIMEOUT = -2,
+    RECV_ERR_OVERACCESS = -3,
+    CON_INPUT_ERR = -4,
+    PROC_DATACH_SESSION = -5,
+    CON_PROC_ERR = -6,
+    REG_SESSION_ERR = -7,
+    REG_PROC_ERR = -8,
+    REG_TASK_ERR = -9,
+    SESSION_QUIT_ERR = -10,
+    CON_OUTPUT_ERR = -11,
+	CON_EXCEPTION_ERR = -12
+};
+
+
+enum CON_STATE {
+    CON_STATE_IDLE = 0,
+    CON_STATE_TERMINATE,
+    CON_STATE_IN_PROCESS,
+    CON_STATE_BUSY,
+    CON_STATE_NOT_CONNECTED,
+    CON_STATE_CONNECTING
+};
+
+
+enum SESSION_STATUS {
+    SESSION_UN_INIT = 0,
+    SESSION_IDLE,
+    SESSION_INPROCESS,
+    SESSION_TERMINATED
+};
+
+//add by jeremy
+enum SESSION_TYPE{
+    SESSION_CONTROL = 0,
+    SESSION_DATA,
+    SESSION_UNKNOWN
+};
+
+
+#endif

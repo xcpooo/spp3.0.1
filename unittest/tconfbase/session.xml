@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<session_group>
+    <session id="0" type="main" subtype="sub" ip="1.0.0.1" port="10000" long_connect="1" timeout="3" block="0" recv_count="5"/> 
+    <session id="1" type="main" subtype="sub" ip="1.0.0.1" port="10000" long_connect="1" timeout="3" block="0" multi_con_inf="1" multi_con_sup="1" recv_count="5" /> 
+</session_group>
+
+

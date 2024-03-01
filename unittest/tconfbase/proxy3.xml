@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<proxy groupid="0">
+
+    <acceptor timeout="60" udpclose=”0”>
+
+        <entry type="tcp" if="eth1" port="10085" TOS="123" />
+
+        <entry type="udp" if="eth1" port="10085"/>
+
+        <entry type="unix" path="/tmp/spp_proxy_unix"/>
+
+    </acceptor>
+
+
+
+    <connector>
+
+        <entry send_size=""  groupid = "1"/>
+
+        <entry send_size="" recv_size="16" groupid = "2"/>
+
+    </connector>
+
+
+
+    <flog level="4" type="0" path="log" prefix="" maxfilenum="10"/>
+
+    <log level="3" type="0" path="../log" 
+
+        prefix="spp_proxy" maxfilesize="10240000" maxfilenum="10"/>
+
+    <fstat file="" intervial="30"/>
+
+    <stat file="../stat/module_stat_spp_proxy.dat" intervial="30"/>
+
+    <moni  level="" path="../moni" prefix="slow fuck" maxfilesize="10240000" maxfilenum="10"/>
+
+    <module bin="./spp_module_test.so" etc=""/>
+
+</proxy>
+
+
+

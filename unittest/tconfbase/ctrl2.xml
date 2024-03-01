@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<controller>
+
+    <procmon>
+
+        <group id="0" basepath="." exe="" etc="../etc/spp_proxy.xml"  maxprocnum="1" minprocnum="1" heartbeat="60" /> 
+
+
+
+        <group id="1" basepath="." exe="spp_worker" etc="../etc/spp_worker1.xml" maxprocnum="1" minprocnum="1" heartbeat="60" /> 
+
+
+
+        <group id="2" basepath="." exe="spp_worker" etc="../etc/spp_worker2.xml" maxprocnum="1" minprocnum="1" heartbeat="60" /> 
+
+    </procmon>
+
+
+
+    <flog level="3" type="0" path="../log" prefix="spp_frame_ctrl" maxfilesize="10240000" maxfilenum="10"/>
+
+    <fstat file="../stat/stat_spp_ctrl.dat" intervial="30"/>
+
+    <moni intervial="30" level="2" path="../moni" prefix="moni_spp_ctrl" maxfilesize="10240000" maxfilenum="10"/>
+
+</controller>
+
+
+

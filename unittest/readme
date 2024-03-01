@@ -1,0 +1,4 @@
+测试框架版本：googletest 1.5.0版
+使用条件：头文件包含gtest-1.5.0/include/gtest/gtest.h
+	库文件包含gtest_main.a
+

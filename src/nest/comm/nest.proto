@@ -1,0 +1,270 @@
+
+/****************************************************************************/
+/*  鸟巢公共头结构定义                                                      */
+/****************************************************************************/
+
+message nest_msg_head
+{
+    optional uint32 msg_type        = 1;        // 消息类型
+    optional uint32 sub_cmd         = 2;        // 子命令字
+    optional uint32 set_id          = 3;        // SET区分
+    optional uint32 sequence        = 4;        // 序列号
+    optional uint32 result          = 5;        // 返回结果
+    optional string err_msg         = 6;        // 错误消息
+}
+
+// 单个进程的负载上报数据
+message nest_proc_stat
+{
+    optional uint32 service_id     = 1;         // 分组id
+    optional uint32 proc_type      = 2;         // 进程类型
+    optional uint32 proc_no        = 3;         // 进程编号
+    optional uint32 proxy_proc_no  = 4;         // proxy进程编号,worker进程使用
+    optional uint32 proc_pid       = 5;         // pid
+    optional uint32 cpu_load       = 6;         // CPU负载
+    optional uint32 mem_used       = 7;         // MEM使用
+    optional uint32 net_used       = 8;         // 网络使用
+
+    optional uint64 total_req      = 10;        // 当前周期请求数
+    optional uint64 total_rsp      = 11;        // 当前周期应答数
+    optional uint64 total_cost     = 12;        // 当前周期总时延
+    optional uint32 min_cost       = 13;        // 当前周期最小时延
+    optional uint32 max_cost       = 14;        // 当前周期最大时延
+    optional uint64 stat_time      = 15;        // 当前周期起始秒数
+}
+
+
+// 进程启动配置信息
+message nest_proc_base
+{
+    optional uint32 service_id     = 1;         // 分组id
+    optional uint32 proc_type      = 2;         // 进程类型
+    optional uint32 proc_no        = 3;         // 进程编号
+    optional uint32 proc_pid       = 4;         // pid -请求无效, 应答有效
+    
+    optional uint32 proxy_proc_no  = 5;         // proxy进程编号，worker进程需要
+    optional string proxy_ip       = 6;         // proxy ip, worker 需要
+    optional uint32 proxy_port     = 7;         // proxy port
+}
+
+
+/****************************************************************************/
+/*  1. 调度中心与调度代理的接口协议定义                                     */
+/****************************************************************************/
+
+// 调度节点初始化请求消息
+message nest_sched_node_init_req
+{
+    optional uint32 task_id        = 1;         // 任务id
+    optional bytes  node_ip        = 2;         // IP地址
+    repeated bytes  servers        = 3;         // 调度server IP地址
+    optional uint32 set_id         = 4;         // set的信息
+}
+
+// 调度节点初始化应答
+message nest_sched_node_init_rsp
+{
+    optional uint32 task_id        = 1;         // 任务id
+    optional bytes  node_ip        = 2;         // IP地址
+    optional bytes  server         = 3;         // 选中IP地址
+    optional uint32 set_id         = 4;         // set的信息
+}
+
+// 调度节点删除请求消息
+message nest_sched_node_term_req
+{
+    optional uint32 task_id        = 1;         // 任务id
+    optional uint32 set_id         = 2;         // set的信息
+    optional bytes  node_ip        = 3;         // IP地址
+}
+
+message nest_service_type
+{
+    optional bytes   name         = 1;          // 业务名
+    optional uint32  type         = 2;          // 业务类型: 微线程[3]/异步[2]/同步[1]类型
+}
+
+// 调度节点负载上报请求消息
+message nest_sched_load_report_req
+{
+    optional bytes  node_ip        = 1;         // IP地址
+    optional uint32 cpu_num        = 2;         // CPU节点
+    optional uint32 cpu_load       = 3;         // CPU负载
+    optional uint32 mem_total      = 4;         // MEM总量
+    optional uint32 mem_used       = 5;         // MEM使用
+    optional uint32 net_total      = 6;         // NET总量
+    optional uint32 net_used       = 7;         // NET使用
+    
+    repeated nest_proc_stat last_stats   = 30;  // 分进程的上报
+    repeated nest_proc_stat stats        = 31;  // 分进程的上报
+    repeated nest_service_type srv_type  = 32;  // 业务类型: 微线程[3]/异步[2]/同步[1]类型
+}
+
+// 调度节点新增进程请求
+message nest_sched_add_proc_req
+{
+    optional uint32 task_id        = 1;         // 任务id
+    optional string service_name   = 2;         // 业务名
+    optional uint32 service_id     = 3;         // 分组id
+    optional uint32 proc_type      = 4;         // 启动进程类型
+    optional string package_name   = 5;         // 插件包
+    repeated nest_proc_base proc_conf = 6;      // 启动进程数
+}
+
+// 调度节点新增进程应答
+message nest_sched_add_proc_rsp
+{
+    optional uint32 task_id        = 1;         // 任务id
+    optional string service_name   = 2;         // 业务名
+    optional uint32 service_id     = 3;         // 分组id
+    optional uint32 proc_type      = 4;         // 启动进程类型
+    optional string package_name   = 5;         // 插件包
+    repeated nest_proc_base proc_info = 6;      // 启动进程数
+}
+
+// fork进程请求
+message nest_sched_proc_fork_req
+{
+    optional uint32 task_id        = 1;         // 任务id	
+    optional string service_name   = 2;         // 业务名
+    optional string package_name   = 3;         // 插件包
+    optional nest_proc_base proc_info = 4;      // 启动进程数
+
+    optional string path = 5;
+    optional string bin  = 6;
+    optional string etc  = 7;
+}
+
+// fork进程应答
+message nest_sched_proc_fork_rsp
+{
+    optional uint32 task_id        = 1;         // 任务id	
+    optional string service_name   = 2;         // 业务名
+    optional string package_name   = 3;         // 插件包
+    optional nest_proc_base proc_info = 4;      // 启动进程数
+
+    optional string path = 5;
+    optional string bin  = 6;
+    optional string etc  = 7;
+
+    optional uint32 proc_pid       = 8;         // pid -请求无效, 应答有效
+}
+
+// 调度节点删除进程请求
+message nest_sched_del_proc_req
+{
+    optional uint32 task_id        = 1;         // 任务id
+    repeated nest_proc_base proc_list = 4;      // 删除进程数
+}
+
+// 调度节点删除进程应答
+message nest_sched_del_proc_rsp
+{
+    optional uint32 task_id        = 1;         // 任务id
+    repeated nest_proc_base proc_list = 4;      // 删除进程数
+}
+
+// 调度节点重启进程请求
+message nest_sched_restart_proc_req
+{
+    optional uint32 task_id        = 1;         // 任务id
+    optional string service_name   = 2;         // 业务名
+    optional string package_name   = 5;         // 插件包
+    repeated nest_proc_base proc_conf = 6;      // 启动进程数
+    optional uint32 proc_all       = 7;         // 启动所有的该service_name的进程
+}
+
+// 调度节点新增进程应答
+message nest_sched_restart_proc_rsp
+{
+    optional uint32 task_id        = 1;         // 任务id
+    optional string service_name   = 2;         // 业务名
+    optional string package_name   = 5;         // 插件包
+    repeated nest_proc_base proc_info = 6;      // 启动进程数
+}
+
+
+// 调度节点业务信息查询
+message nest_sched_service_info_req
+{
+    optional uint32 task_id        = 1;         // 任务id
+    optional string service_name   = 2;         // 业务名
+}
+
+// 调度节点业务信息查询
+message nest_sched_service_info_rsp
+{
+    optional uint32 task_id       = 1;         // 任务id
+    optional uint32 proc_cnt      = 2;         // 进程个数
+}
+
+// 调度节点进程心跳
+message nest_proc_heartbeat_req
+{
+    optional nest_proc_base proc   = 1;         // 基本信息
+    optional uint32 state          = 2;         // 进程状态
+    optional string service_name   = 3;         // 业务名
+    optional string package_name   = 4;         // 插件包
+}
+
+// 调度节点进程启动
+message nest_proc_init_req
+{
+    optional nest_proc_base proc   = 1;         // 基本信息
+    optional string service_name   = 3;         // 业务名
+    optional string package_name   = 4;         // 插件包
+}
+
+// 调度节点进程启动
+message nest_proc_init_rsp
+{
+    optional nest_proc_base proc   = 1;         // 基本信息
+    optional uint32         type   = 2;         // worker类型
+}
+
+
+// 调度节点进程暂停
+message nest_proc_suspend_req
+{
+    optional uint32 service_id     = 1;         // 分组id
+    optional uint32 proc_no        = 2;         // 进程编号
+    optional uint32 proc_pid       = 3;         // pid
+}
+
+// 调度节点进程删除
+message nest_proc_stop_req
+{
+    optional uint32 service_id     = 1;         // 分组id
+    optional uint32 proc_no        = 2;         // 进程编号
+    optional uint32 proc_pid       = 3;         // pid
+}
+
+// 调度节点进程负载上报
+message nest_proc_stat_report_req
+{
+    optional nest_proc_stat stat   = 1;         // 业务状态
+}
+
+
+// 调度节点查询进程负载上报请求
+message nest_agent_sysload_req
+{
+    optional uint32 cpu_num        = 1;         // CPU节点
+    optional uint32 cpu_total      = 2;         // CPU节点
+    optional uint32 cpu_load       = 3;         // CPU负载
+    optional uint32 mem_total      = 4;         // MEM总量
+    optional uint32 mem_used       = 5;         // MEM使用
+    optional uint32 net_total      = 6;         // NET总量
+    optional uint32 net_used       = 7;         // NET使用
+    
+    repeated nest_proc_stat stats  = 31;        // 分进程的上报
+}
+
+// 调度节点查询进程负载上报应答
+message nest_agent_sysload_rsp
+{
+    repeated uint32 pids           = 1;        // 当前最新的进程列表
+}
+
+
+
